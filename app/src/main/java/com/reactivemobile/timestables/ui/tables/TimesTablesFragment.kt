@@ -5,25 +5,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
-import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.reactivemobile.timestables.R
+import com.reactivemobile.timestables.ui.HeadlineText
 import com.reactivemobile.timestables.ui.theme.TimesTablesTheme
 
 @ExperimentalFoundationApi
@@ -33,13 +34,12 @@ class TimesTablesFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(this.requireContext()).apply {
+    ): View =
+        ComposeView(requireContext()).apply {
             setContent {
                 RenderBoard()
             }
         }
-    }
 
     @Composable
     @Preview
@@ -51,51 +51,108 @@ class TimesTablesFragment : Fragment() {
         }
 
         TimesTablesTheme {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    DrawResultsIcons(state)
 
-                Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-                    state.results.forEach {
-                        Text(text = it?.let { if (it) "✓" else "✘" } ?: "?",
-                            color = it?.let { if (it) Color.Green else Color.Red } ?: Color.Gray,
-                            fontSize = 30.sp,
-                            modifier = Modifier.padding(all = 2.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        DrawGrid(state = state)
+                    }
+
+                    if (state.inProgress) {
+                        Row {
+                            HeadlineText(
+                                string = getString(
+                                    R.string.times_tables_current_question,
+                                    state.currentQuestion,
+                                    state.chosenNumber
+                                )
+                            )
+                        }
+
+                        TextField(
+                            value = text,
+                            onValueChange = { text = it },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Go
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onGo = {
+                                    viewModel.answer(text)
+                                    text = ""
+                                },
+                            )
+                        )
+                    } else {
+                        Row(Modifier.padding(16.dp)) {
+                            HeadlineText(
+                                string = getString(
+                                    R.string.times_tables_results,
+                                    state.correctCount,
+                                    state.totalCount
+                                )
+                            )
+                        }
+
+                        Row {
+                            Button(onClick = { findNavController().popBackStack() }) {
+                                HeadlineText(stringRes = R.string.times_tables_finished)
+                            }
+                        }
                     }
                 }
+            }
+        }
+    }
 
-                if (state.inProgress) {
+    @Composable
+    private fun ResultImage(value: Boolean?, current: Boolean) {
+        val resourceId = if (current) {
+            R.drawable.result_current
+        } else when (value) {
+            null -> R.drawable.result_neutral
+            true -> R.drawable.result_correct
+            false -> R.drawable.result_incorrect
+        }
+
+        val contentDescription =
+            value?.let { result -> if (result) "success" else "failure" }
+
+        Image(
+            painter = painterResource(id = resourceId),
+            contentDescription = contentDescription
+        )
+    }
+
+    @Composable
+    private fun DrawResultsIcons(state: TimesTablesViewModel.TimesTableState) =
+        Row {
+            state.results.forEachIndexed { index, result ->
+                ResultImage(value = result, state.current == index)
+            }
+        }
+
+    @Composable
+    private fun DrawGrid(state: TimesTablesViewModel.TimesTableState) {
+        if (state.inProgress) {
+            Column {
+                for (x in 0 until state.chosenNumber) {
                     Row {
-                        Text(
-                            text = "${state.currentQuestion} x ${state.chosenNumber}",
-                            fontSize = 30.sp
-                        )
-                    }
-
-                    TextField(
-                        value = text,
-                        onValueChange = { text = it },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Go
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onGo = {
-                                viewModel.answer(text)
-                                text = ""
-                            },
-                        )
-                    )
-                } else {
-                    Row(Modifier.padding(16.dp)) {
-                        Text(text = "${state.correctCount} / ${state.totalCount}", fontSize = 40.sp)
-
-                    }
-
-                    Row {
-                        Button(onClick = { findNavController().popBackStack() }) {
-                            Text(text = "Finished")
+                        for (y in 0 until state.currentQuestion) {
+                            Image(
+                                painter = painterResource(id = R.drawable.square),
+                                contentDescription = null
+                            )
                         }
                     }
                 }
@@ -103,3 +160,4 @@ class TimesTablesFragment : Fragment() {
         }
     }
 }
+

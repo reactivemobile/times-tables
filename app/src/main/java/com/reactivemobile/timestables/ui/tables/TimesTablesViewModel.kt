@@ -24,25 +24,28 @@ class TimesTablesViewModel @Inject constructor(
     fun answer(answer: String) {
         intent {
             reduce {
-                val correctAnswer = state.currentQuestion * state.chosenNumber
-                val correct = if(answer.isBlank()) false else (answer.toInt() == correctAnswer)
-                val currentIndex = state.current
+                val correct = if(answer.isBlank()) false else (answer.toInt() == state.currentQuestion * state.chosenNumber)
+
                 state.copy(
                     chosenNumber = state.chosenNumber,
                     current = state.current + 1,
                     currentQuestion = state.current+2,
-                    results = state.results.apply {
-                        this[currentIndex] = correct
+                    results = List(TOTAL) {
+                        if (it == state.current) {
+                            correct
+                        } else {
+                            state.results[it]
+                        }
                     },
                     resultsString = createResultsString(state.results),
-                    inProgress = currentIndex < TOTAL - 1,
+                    inProgress = state.current < TOTAL - 1,
                     correctCount = if(correct) state.correctCount+1 else state.correctCount
                 )
             }
         }
     }
 
-    private fun createResultsString(results: MutableList<Boolean?>): String =
+    private fun createResultsString(results: List<Boolean?>): String =
         results.joinToString("") {
             it?.let { if (it) "✓" else "✘" } ?: "-"
         }
@@ -51,7 +54,7 @@ class TimesTablesViewModel @Inject constructor(
         val chosenNumber: Int,
         val current: Int = 0,
         val currentQuestion: Int = 1,
-        val results: MutableList<Boolean?> = MutableList(TOTAL) { null },
+        val results: List<Boolean?> = List(TOTAL) { null },
         val resultsString: String = "-".repeat(TOTAL),
         var inProgress: Boolean = true,
         val correctCount: Int = 0,

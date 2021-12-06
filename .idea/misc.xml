@@ -8,7 +8,13 @@
         <entry key="../../../../../layout/compose-model-1638224237757.xml" value="0.45" />
         <entry key="../../../../../layout/compose-model-1638310187047.xml" value="0.1814814814814815" />
         <entry key="../../../../../layout/compose-model-1638396547064.xml" value="0.17962962962962964" />
+        <entry key="../../../../../layout/compose-model-1638807497546.xml" value="0.1" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.14629629629629629" />
+        <entry key="app/src/main/res/drawable/result_correct.xml" value="0.22870370370370371" />
+        <entry key="app/src/main/res/drawable/result_current.xml" value="0.22870370370370371" />
+        <entry key="app/src/main/res/drawable/result_incorrect.xml" value="0.22870370370370371" />
+        <entry key="app/src/main/res/drawable/result_neutral.xml" value="0.22870370370370371" />
+        <entry key="app/src/main/res/drawable/square.xml" value="0.22870370370370371" />
         <entry key="app/src/main/res/layout/fragment_times_tables.xml" value="0.17708333333333334" />
       </map>
     </option>
