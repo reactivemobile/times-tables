@@ -1,6 +1,7 @@
 package com.reactivemobile.timestables.ui.theme
 
 import androidx.compose.material.Typography
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -11,7 +12,14 @@ val Typography = Typography(
     body1 = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp
+        fontSize = 16.sp,
+        color = Blue200
+    ),
+    h3 = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Bold,
+        fontSize = 32.sp,
+        color = Blue200,
     )
     /* Other default text styles to override
     button = TextStyle(
