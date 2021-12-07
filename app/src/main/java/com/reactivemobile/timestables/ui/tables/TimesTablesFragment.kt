@@ -52,18 +52,24 @@ class TimesTablesFragment : Fragment() {
 
         TimesTablesTheme {
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    DrawResultsIcons(state)
+                    HeadlineText(
+                        string = getString(
+                            R.string.times_tables_question_title,
+                            state.chosenNumber
+                        )
+                    )
 
                     Row(
                         horizontalArrangement = Arrangement.SpaceEvenly,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth().padding(16.dp)
                     ) {
                         DrawGrid(state = state)
                     }
@@ -114,33 +120,6 @@ class TimesTablesFragment : Fragment() {
             }
         }
     }
-
-    @Composable
-    private fun ResultImage(value: Boolean?, current: Boolean) {
-        val resourceId = if (current) {
-            R.drawable.result_current
-        } else when (value) {
-            null -> R.drawable.result_neutral
-            true -> R.drawable.result_correct
-            false -> R.drawable.result_incorrect
-        }
-
-        val contentDescription =
-            value?.let { result -> if (result) "success" else "failure" }
-
-        Image(
-            painter = painterResource(id = resourceId),
-            contentDescription = contentDescription
-        )
-    }
-
-    @Composable
-    private fun DrawResultsIcons(state: TimesTablesViewModel.TimesTableState) =
-        Row {
-            state.results.forEachIndexed { index, result ->
-                ResultImage(value = result, state.current == index)
-            }
-        }
 
     @Composable
     private fun DrawGrid(state: TimesTablesViewModel.TimesTableState) {
