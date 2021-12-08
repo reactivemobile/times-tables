@@ -21,7 +21,7 @@ fun HeadlineText(@StringRes stringRes: Int) {
 }
 
 @Composable
-fun HeadlineText(string :String) {
+fun HeadlineText(string: String) {
     Text(
         text = string,
         modifier = Modifier.padding(all = 8.dp),

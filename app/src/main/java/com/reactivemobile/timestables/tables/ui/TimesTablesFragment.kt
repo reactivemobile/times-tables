@@ -1,5 +1,7 @@
-package com.reactivemobile.timestables.ui.tables
+package com.reactivemobile.timestables.tables.ui
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +16,6 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -24,27 +25,47 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.reactivemobile.timestables.R
+import com.reactivemobile.timestables.databinding.FragmentTimesTablesBinding
+import com.reactivemobile.timestables.tables.viewmodel.TimesTablesViewModel
+import com.reactivemobile.timestables.tables.viewmodel.TimesTablesViewModel.SideEffect
 import com.reactivemobile.timestables.ui.HeadlineText
 import com.reactivemobile.timestables.ui.theme.TimesTablesTheme
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 @ExperimentalFoundationApi
 class TimesTablesFragment : Fragment() {
     private val viewModel by viewModels<TimesTablesViewModel>()
 
+    private lateinit var binding: FragmentTimesTablesBinding
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View =
-        ComposeView(requireContext()).apply {
-            setContent {
-                RenderBoard()
+    ): View? = inflater.inflate(R.layout.fragment_times_tables, container, false)
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding = FragmentTimesTablesBinding.bind(view).apply {
+            composeView.apply {
+                setContent {
+                    RenderBoard()
+                }
             }
         }
+    }
 
     @Composable
     @Preview
     fun RenderBoard() {
         val state = viewModel.container.stateFlow.collectAsState().value
+
+        LaunchedEffect(viewModel) {
+            launch {
+                viewModel.container.sideEffectFlow.collect { handleSideEffect(it) }
+            }
+        }
 
         var text by remember {
             mutableStateOf("")
@@ -69,7 +90,9 @@ class TimesTablesFragment : Fragment() {
 
                     Row(
                         horizontalArrangement = Arrangement.SpaceEvenly,
-                        modifier = Modifier.fillMaxWidth().padding(16.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
                     ) {
                         DrawGrid(state = state)
                     }
@@ -121,22 +144,58 @@ class TimesTablesFragment : Fragment() {
         }
     }
 
-    @Composable
-    private fun DrawGrid(state: TimesTablesViewModel.TimesTableState) {
-        if (state.inProgress) {
-            Column {
-                for (x in 0 until state.chosenNumber) {
-                    Row {
-                        for (y in 0 until state.currentQuestion) {
-                            Image(
-                                painter = painterResource(id = R.drawable.square),
-                                contentDescription = null
-                            )
+    private fun handleSideEffect(sideEffect: SideEffect) {
+        val image : Int
+
+            if (sideEffect is SideEffect.Correct) {
+                image = R.drawable.result_correct
+            } else {
+                image = R.drawable.result_incorrect
+            }
+
+        binding.imageView
+            .apply {
+
+                setImageResource(image)
+
+                alpha = 0f
+                scaleX = 1f
+                scaleY = 1f
+                rotation = 0f
+                visibility = View.VISIBLE
+                animate()
+                    .alpha(1f)
+                    .scaleXBy(4f)
+                    .scaleYBy(4f)
+                    .setDuration(500)
+                    .setListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator?) {
+                            animate()
+                                .alpha(0f)
+                                .setDuration(500)
+                                .setListener(null)
                         }
+                    })
+            }
+    }
+}
+
+@Composable
+private fun DrawGrid(state: TimesTablesViewModel.State) {
+    if (state.inProgress) {
+        Column {
+            for (x in 0 until state.chosenNumber) {
+                Row {
+                    for (y in 0 until state.currentQuestion) {
+                        Image(
+                            painter = painterResource(id = R.drawable.square),
+                            contentDescription = null
+                        )
                     }
                 }
             }
         }
     }
 }
+
 

@@ -1,7 +1,6 @@
 package com.reactivemobile.timestables
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.fragment.app.FragmentActivity
 import dagger.hilt.android.AndroidEntryPoint
 
