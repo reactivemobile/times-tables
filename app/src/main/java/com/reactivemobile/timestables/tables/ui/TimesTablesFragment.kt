@@ -167,8 +167,10 @@ class TimesTablesFragment : Fragment() {
 
     private fun handleSideEffect(sideEffect: SideEffect) {
         if (sideEffect is SideEffect.Correct) {
+            binding.animationIncorrect.visibility = INVISIBLE
             binding.animationCorrect.playAndAutoHide()
         } else {
+            binding.animationCorrect.visibility = INVISIBLE
             binding.animationIncorrect.playAndAutoHide()
         }
     }
