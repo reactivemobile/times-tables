@@ -5,6 +5,8 @@ import android.animation.AnimatorListenerAdapter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -24,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.airbnb.lottie.LottieAnimationView
 import com.reactivemobile.timestables.R
 import com.reactivemobile.timestables.databinding.FragmentTimesTablesBinding
 import com.reactivemobile.timestables.tables.viewmodel.TimesTablesViewModel
@@ -144,58 +147,43 @@ class TimesTablesFragment : Fragment() {
         }
     }
 
-    private fun handleSideEffect(sideEffect: SideEffect) {
-        val image : Int
-
-            if (sideEffect is SideEffect.Correct) {
-                image = R.drawable.result_correct
-            } else {
-                image = R.drawable.result_incorrect
-            }
-
-        binding.imageView
-            .apply {
-
-                setImageResource(image)
-
-                alpha = 0f
-                scaleX = 1f
-                scaleY = 1f
-                rotation = 0f
-                visibility = View.VISIBLE
-                animate()
-                    .alpha(1f)
-                    .scaleXBy(4f)
-                    .scaleYBy(4f)
-                    .setDuration(500)
-                    .setListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator?) {
-                            animate()
-                                .alpha(0f)
-                                .setDuration(500)
-                                .setListener(null)
+    @Composable
+    private fun DrawGrid(state: TimesTablesViewModel.State) {
+        if (state.inProgress) {
+            Column {
+                for (x in 0 until state.chosenNumber) {
+                    Row {
+                        for (y in 0 until state.currentQuestion) {
+                            Image(
+                                painter = painterResource(id = R.drawable.square),
+                                contentDescription = null
+                            )
                         }
-                    })
-            }
-    }
-}
-
-@Composable
-private fun DrawGrid(state: TimesTablesViewModel.State) {
-    if (state.inProgress) {
-        Column {
-            for (x in 0 until state.chosenNumber) {
-                Row {
-                    for (y in 0 until state.currentQuestion) {
-                        Image(
-                            painter = painterResource(id = R.drawable.square),
-                            contentDescription = null
-                        )
                     }
                 }
             }
         }
     }
+
+    private fun handleSideEffect(sideEffect: SideEffect) {
+        if (sideEffect is SideEffect.Correct) {
+            binding.animationCorrect.playAndAutoHide()
+        } else {
+            binding.animationIncorrect.playAndAutoHide()
+        }
+    }
+
+    private fun LottieAnimationView.playAndAutoHide() {
+        visibility = VISIBLE
+        playAnimation()
+        addAnimatorListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                super.onAnimationEnd(animation)
+                visibility = INVISIBLE
+            }
+        })
+    }
 }
+
 
 

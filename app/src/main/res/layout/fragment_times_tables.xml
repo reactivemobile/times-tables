@@ -4,6 +4,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/animation_correct"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:alpha="0.5"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_fileName="correct.json" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/animation_incorrect"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:alpha="0.5"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_fileName="incorrect.json" />
+
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/compose_view"
         android:layout_width="0dp"
@@ -11,16 +31,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView android:scaleType="fitXY"
-        android:id="@+id/image_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/animation_correct" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
